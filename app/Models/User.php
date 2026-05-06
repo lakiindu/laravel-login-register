@@ -48,4 +48,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function membership()
+{
+    return $this->belongsTo(Membership::class);
+}
 }
