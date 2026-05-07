@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Membership;
+use App\Models\UserMembership;
 
 class MembershipController extends Controller
 {
     public function index()
     {
         $memberships = Membership::all();
+
         return view('memberships.index', compact('memberships'));
     }
 
@@ -33,6 +37,7 @@ class MembershipController extends Controller
     public function edit($id)
     {
         $membership = Membership::findOrFail($id);
+
         return view('memberships.edit', compact('membership'));
     }
 
@@ -45,11 +50,16 @@ class MembershipController extends Controller
         return redirect('/memberships')->with('success', 'Updated successfully');
     }
 
-    public function destroy($id)
+    /* ✅ JOIN MEMBERSHIP */
+    public function join($id)
     {
-        $membership = Membership::findOrFail($id);
-        $membership->delete();
+        UserMembership::firstOrCreate([
+            'user_id' => Auth::id(),
+            'membership_id' => $id
+    ], [
+        'status' => 'active'
+    ]);
 
-        return redirect('/memberships')->with('success', 'Deleted successfully');
+        return back()->with('success', 'Membership activated!');
     }
 }
